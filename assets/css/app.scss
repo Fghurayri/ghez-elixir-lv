@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "OpenSans";
+    src: url(/fonts/OpenSans-Regular.ttf) format("truetype");
+  }
+
+  @font-face {
+    font-family: "SigmarOne";
+    src: url(/fonts/SigmarOne-Regular.ttf) format("truetype");
+  }
+}
