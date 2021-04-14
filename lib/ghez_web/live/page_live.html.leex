@@ -33,23 +33,23 @@
 <% end %>
 <%= if @selected_car != "" do %>
   <div class="flex flex-col lg:flex-row justify-evenly items-center pt-16">
-    <div
+    <button
      phx-click="select-power"
      phx-value-volt="<%= @power_220.volt %>"
      class="cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900 text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest <%= is_selecting_power(assigns, @power_220) && "ring-8 ring-red-700 ring-opacity-50" %>">
       220V
-    </div>
-    <div
+    </button>
+    <button
       phx-click="select-power"
       phx-value-volt="<%= @power_110.volt %>"
       class="mt-10 lg:mt-0 cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900 text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest <%= is_selecting_power(assigns, @power_110) && "ring-8 ring-red-700 ring-opacity-50" %>">
       110V
-    </div>
+    </button>
   </div>
   <div class="flex justify-center items-center p-10">
   </div>
   <p class="text-gray-600 text-lg leading-10 tracking-widest">When you 🔌 the <span class="font-bold text-indigo-900"><%= @selected_car.name %></span> with SoC of <span class="font-bold text-indigo-900"><%= @starting_soc %>%</span> 🔋 and range of <span class="font-bold text-indigo-900"><%= calculate_dte(assigns, @starting_soc) %>km</span> using <span class="font-bold text-indigo-900"><%= calculate_watt(@selected_power.volt)  %> watt</span>, then it will take around <span class="font-bold text-indigo-900"><%= calculate_time(assigns) %></span> to reach SoC of <span class="font-bold text-indigo-900"><%= @targeting_soc %>%</span> 🔋 and range of <span class="font-bold text-indigo-900"><%= calculate_dte(assigns, @targeting_soc) %>km</span>. The total cost will be <span class="font-bold text-indigo-900">SAR <%= calculate_charging_cost(assigns) %></span> 💰</p>
   <div class="mt-10 text-2xl text-center">
-    <span class="p-4 cursor-pointer" phx-click="reset">🧹</span>
+    <button class="p-4 cursor-pointer" phx-click="reset">🧹</button>
   </div>
 <% end %>
