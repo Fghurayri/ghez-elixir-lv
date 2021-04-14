@@ -7,26 +7,19 @@ defmodule Ghez.Power do
   source: https://saso.gov.sa/ar/mediacenter/news/Pages/saso_news_449.aspx
   """
 
+  defstruct volt: nil, amp: nil
+
   @charging_efficiency 0.9
   @kwh_rate_in_halalah 0.16
 
-  @power_220 %{
-    volt: 220,
-    amp: 13
-  }
-  @power_110 %{
-    volt: 110,
-    amp: 15
-  }
-
-  def get_power_spec(220), do: @power_220
-  def get_power_spec(110), do: @power_110
+  def get_power_spec(220), do: %__MODULE__{volt: 220, amp: 13}
+  def get_power_spec(110), do: %__MODULE__{volt: 110, amp: 15}
 
   def get_power_by_volt(volt) do
     get_power_spec(volt)
   end
 
-  def get_watt(%{volt: volt, amp: amp}) do
+  def get_watt(%__MODULE__{volt: volt, amp: amp}) do
     volt * amp
   end
 
