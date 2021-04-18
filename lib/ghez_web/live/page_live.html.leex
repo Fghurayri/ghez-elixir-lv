@@ -1,3 +1,43 @@
+<script>
+  function calculations() {
+    return {
+      car: JSON.parse(document.getElementById("result").dataset.car),
+      selectedPower: 220,
+      availablePowers: {
+        220: {volt: 220, amp: 13},
+        110: {volt: 110, amp: 15}
+      },
+      startingSoc: 20,
+      targetSoc: 80,
+      kwh_price_rate: 0.16,
+      charging_efficiency: 0.9,
+      calculateWatt(){
+        const {volt, amp} = this.availablePowers[this.selectedPower]
+        return volt * amp
+      },
+      calculateRangeAtPercentage(percentage){
+        return Math.floor((percentage / 100) * this.car.range_in_km);
+      },
+      calculateChargingTime(){
+        const capacityToFill = this.getCapacityToFill();
+        const absoluteHours = this.car.battery_size / ((this.calculateWatt() /1000) * this.charging_efficiency)
+        const hours = Math.floor(absoluteHours);
+        const minutes = Math.floor((absoluteHours - hours) * 60);
+        const hoursText = `${hours} hours`;
+        const minutesText = `${minutes} minutes`;
+        if (hours && minutes) return `${hoursText} and ${minutesText}`;
+        if (hours) return hoursText;
+        return minutesText;
+      },
+      calculateChargingCost(){
+        return this.kwh_price_rate * this.getCapacityToFill();
+      },
+      getCapacityToFill(){
+        return ((this.targetSoc - this.startingSoc) / 100) * this.car.battery_size;
+      }
+    };
+   }
+</script>
 <div>
   <div class="flex flex-col lg:flex-row justify-center items-center pt-16">
     <div class="flex-1">
@@ -45,32 +85,35 @@
     </div>
   <% end %>
   <%= if @selected_car.name do %>
-    <div id="result" phx-hook="Calculations" data-car="<%= Jason.encode!(@selected_car) %>">
+    <div id="result" x-data="calculations()" data-car="<%= Jason.encode!(@selected_car) %>">
       <div class="flex flex-col lg:flex-row justify-evenly items-center pt-16">
         <button
-          id="220V"
+          @click="selectedPower = 220"
           class="cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900
-            text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest">
+            text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest"
+          :class="{'ring-8 ring-red-700 ring-opacity-50': selectedPower === 220}">
           220V
         </button>
         <button
-          id="110V"
+          @click="selectedPower = 110"
           class="mt-10 lg:mt-0 cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900
-             text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest">
+             text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest"
+             :class="{'ring-8 ring-red-700 ring-opacity-50': selectedPower === 110}"
+           >
           110V
         </button>
       </div>
       <div class="flex justify-center items-center p-10">
       </div>
       <p class="text-gray-600 text-lg leading-10 tracking-widest">
-        When you 🔌 the <span id="car-name" class="font-bold text-indigo-900"></span>
-        with SoC of <span id="starting-soc" class="font-bold text-indigo-900"></span>🔋
-        and range of <span id="starting-soc-range" class="font-bold text-indigo-900"></span>
-        using <span id="watt" class="font-bold text-indigo-900"></span>,
-        then it will take around <span id="charging-time" class="font-bold text-indigo-900"></span>
-        to reach SoC of <span id="target-soc" class="font-bold text-indigo-900"></span>🔋
-        and range of <span id="target-soc-range" class="font-bold text-indigo-900"></span>.
-        The total cost will be <span id="cost" class="font-bold text-indigo-900"></span> 💰
+        When you 🔌 the <span x-text="car.name" class="font-bold text-indigo-900"></span>
+        with SoC of <span x-text="`${startingSoc}%`" class="font-bold text-indigo-900"></span>🔋
+        and range of <span x-text="`${calculateRangeAtPercentage(startingSoc)} km`" class="font-bold text-indigo-900"></span>
+        using <span x-text="`${calculateWatt()} watt`" class="font-bold text-indigo-900"></span>,
+        then it will take around <span x-text="calculateChargingTime()" class="font-bold text-indigo-900"></span>
+        to reach SoC of <span x-text="`${targetSoc}%`" class="font-bold text-indigo-900"></span>🔋
+        and range of <span x-text="`${calculateRangeAtPercentage(targetSoc)} km`" class="font-bold text-indigo-900"></span>.
+        The total cost will be <span x-text="`SAR ${calculateChargingCost()}`" class="font-bold text-indigo-900"></span> 💰
       </p>
       <div class="mt-5 text-xs text-center text-gray-600 opacity-80">
         <button class="p-4 cursor-pointer" phx-click="reset">another car? <span class="text-2xl">🧹</span></button>
