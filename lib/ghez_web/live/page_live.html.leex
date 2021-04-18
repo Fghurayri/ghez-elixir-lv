@@ -3,53 +3,77 @@
     <div class="flex-1">
       <%= live_component @socket, HeroImage %>
     </div>
-    <div class="flex-1 pt-6 font-hero text-center opacity-90 text-indigo-900 text-4xl leading-normal tracking-widest">
+    <div class="flex-1 pt-6 font-hero text-center opacity-90 text-indigo-900
+                text-4xl leading-normal tracking-widest">
       <p>Esitmate</p>
       <p>the ⏰ and 💰</p>
       <p>of ⚡ EV 🚗</p>
     </div>
   </div>
 </div>
-<%= if @selected_car == "" do %>
-  <form phx-change="suggest-car" class="flex justify-center items-center pt-16">
-    <input type="text" name="car" value="<%= @car_input %>" list="matches" phx-debounce="300"
-    placeholder="Lucid Air Concept 🇸🇦"
-  class="w-2/3 h-16 shadow-lg text-lg text-center block sm:text-sm border-gray-300 rounded-md"
-  >
-    <datalist id="matches">
-      <%= for match <- @matches do %>
-        <option value="<%= match.name %>"><%= match.name %></option>
+<%= if !@selected_car.name do %>
+  <form
+    phx-submit="select-car"
+    phx-change="suggest-car"
+    class="flex flex-col justify-center items-center pt-16"
+    autocomplete="off">
+    <input
+      type="text"
+      name="car"
+      value="<%= @car %>"
+      list="matches"
+      placeholder="Lucid Air Concept 🇸🇦"
+      class="w-2/3 h-16 shadow-lg text-lg text-center block sm:text-sm border-gray-300 rounded-md">
+      <%= if @not_found do %>
+        <div class="text-red-500 text-center">not found</div>
       <% end %>
-    </datalist>
-  </form>
-  <div class="flex flex-col justify-center items-center pt-20">
-    <%= live_component @socket, ArrowImage %>
-    <p class="text-gray-600 pt-12 opacity-80 leading-10 tracking-widest">We have many EVs 🔌</p>
-    <div class="flex justify-center items-center pb-4">
-      <p class="text-gray-600 opacity-80 leading-10 tracking-widest pr-2">Can't find what you are looking for? Ping me on</p>
-      <%= live_component @socket, TwitterIcon %>
+      <datalist id="matches">
+        <%= for match <- @matches do %>
+          <option value="<%= match.name %>"><%= match.name %></option>
+        <% end %>
+      </datalist>
+    </form>
+    <div class="flex flex-col justify-center items-center pt-20">
+      <%= live_component @socket, ArrowImage %>
+      <p class="text-gray-600 pt-12 opacity-80 leading-10 tracking-widest">We have many EVs 🔌</p>
+      <div class="flex justify-center items-center pb-4">
+        <p class="text-gray-600 opacity-80 leading-10 tracking-widest pr-2">
+          Can't find what you are looking for? Ping me on
+        </p>
+        <%= live_component @socket, TwitterIcon %>
+      </div>
     </div>
-  </div>
-<% end %>
-<%= if @selected_car != "" do %>
-  <div class="flex flex-col lg:flex-row justify-evenly items-center pt-16">
-    <button
-     phx-click="select-power"
-     phx-value-volt="<%= @power_220.volt %>"
-     class="cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900 text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest <%= is_selecting_power(assigns, @power_220) && "ring-8 ring-red-700 ring-opacity-50" %>">
-      220V
-    </button>
-    <button
-      phx-click="select-power"
-      phx-value-volt="<%= @power_110.volt %>"
-      class="mt-10 lg:mt-0 cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900 text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest <%= is_selecting_power(assigns, @power_110) && "ring-8 ring-red-700 ring-opacity-50" %>">
-      110V
-    </button>
-  </div>
-  <div class="flex justify-center items-center p-10">
-  </div>
-  <p class="text-gray-600 text-lg leading-10 tracking-widest">When you 🔌 the <span class="font-bold text-indigo-900"><%= @selected_car.name %></span> with SoC of <span class="font-bold text-indigo-900"><%= @starting_soc %>%</span> 🔋 and range of <span class="font-bold text-indigo-900"><%= calculate_dte(assigns, @starting_soc) %>km</span> using <span class="font-bold text-indigo-900"><%= calculate_watt(@selected_power.volt)  %> watt</span>, then it will take around <span class="font-bold text-indigo-900"><%= calculate_time(assigns) %></span> to reach SoC of <span class="font-bold text-indigo-900"><%= @targeting_soc %>%</span> 🔋 and range of <span class="font-bold text-indigo-900"><%= calculate_dte(assigns, @targeting_soc) %>km</span>. The total cost will be <span class="font-bold text-indigo-900">SAR <%= calculate_charging_cost(assigns) %></span> 💰</p>
-  <div class="mt-10 text-2xl text-center">
-    <button class="p-4 cursor-pointer" phx-click="reset">🧹</button>
-  </div>
-<% end %>
+  <% end %>
+  <%= if @selected_car.name do %>
+    <div id="result" phx-hook="Calculations" data-car="<%= Jason.encode!(@selected_car) %>">
+      <div class="flex flex-col lg:flex-row justify-evenly items-center pt-16">
+        <button
+          id="220V"
+          class="cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900
+            text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest">
+          220V
+        </button>
+        <button
+          id="110V"
+          class="mt-10 lg:mt-0 cursor-pointer bg-white w-1/2 lg:w-1/4 h-40 rounded-md shadow-lg text-indigo-900
+             text-2xl opacity-90 flex justify-center items-center leading-normal tracking-widest">
+          110V
+        </button>
+      </div>
+      <div class="flex justify-center items-center p-10">
+      </div>
+      <p class="text-gray-600 text-lg leading-10 tracking-widest">
+        When you 🔌 the <span id="car-name" class="font-bold text-indigo-900"></span>
+        with SoC of <span id="starting-soc" class="font-bold text-indigo-900"></span>🔋
+        and range of <span id="starting-soc-range" class="font-bold text-indigo-900"></span>
+        using <span id="watt" class="font-bold text-indigo-900"></span>,
+        then it will take around <span id="charging-time" class="font-bold text-indigo-900"></span>
+        to reach SoC of <span id="target-soc" class="font-bold text-indigo-900"></span>🔋
+        and range of <span id="target-soc-range" class="font-bold text-indigo-900"></span>.
+        The total cost will be <span id="cost" class="font-bold text-indigo-900"></span> 💰
+      </p>
+      <div class="mt-5 text-xs text-center text-gray-600 opacity-80">
+        <button class="p-4 cursor-pointer" phx-click="reset">another car? <span class="text-2xl">🧹</span></button>
+      </div>
+    </div>
+  <% end %>

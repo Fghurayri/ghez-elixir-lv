@@ -7,6 +7,10 @@ defmodule Ghez.Cars do
     Enum.filter(list_cars(), fn car -> String.downcase(car.name) =~ String.downcase(term) end)
   end
 
+  def get_car(car_name) do
+    Enum.filter(list_cars(), fn car -> car.name == car_name end)
+  end
+
   def list_cars do
     [
       %Car{
