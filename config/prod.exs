@@ -12,6 +12,7 @@ use Mix.Config
 config :ghez, GhezWeb.Endpoint,
   url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
   check_origin: ["//*.faisal.sh", "https://ghez.gigalixirapp.com"],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
