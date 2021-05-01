@@ -12,7 +12,7 @@ You can check the app [here](https://ghez.gigalixirapp.com/)
 
 ## Todos
 
-- [] Add tests to experiment with Phoenix and LiveView testing
+- [x] Add tests to experiment with Phoenix and LiveView testing
 - [] Add Multi-range-input to allow the user to select the starting SOC and the target SOC.
 - [] Add an external CMS to control the list of cars and cache them in ETS.
 - [] Add support for patching the URL to enable sharing an EV infromation through a URL

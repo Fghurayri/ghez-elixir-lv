@@ -53,6 +53,7 @@
 </div>
 <%= if !@selected_car.name do %>
   <form
+    id="ev-name"
     phx-submit="select-car"
     phx-change="suggest-car"
     class="flex flex-col justify-center items-center pt-16"
@@ -68,8 +69,8 @@
         <div class="text-red-500 text-center">not found</div>
       <% end %>
       <datalist id="matches">
-        <%= for match <- @matches do %>
-          <option value="<%= match.name %>"><%= match.name %></option>
+        <%= for {match, idx} <- Enum.with_index(@matches) do %>
+          <option id="match-<%= idx %>" value="<%= match.name %>"><%= match.name %></option>
         <% end %>
       </datalist>
     </form>
@@ -106,14 +107,14 @@
       <div class="flex justify-center items-center p-10">
       </div>
       <p class="text-gray-600 text-lg leading-10 tracking-widest">
-        When you 🔌 the <span x-text="car.name" class="font-bold text-indigo-900"></span>
+        When you 🔌 the <span x-text="car.name" id="car-name" class="font-bold text-indigo-900"></span>
         with SoC of <span x-text="`${startingSoc}%`" class="font-bold text-indigo-900"></span>🔋
         and range of <span x-text="`${calculateRangeAtPercentage(startingSoc)} km`" class="font-bold text-indigo-900"></span>
         using <span x-text="`${calculateWatt()} watt`" class="font-bold text-indigo-900"></span>,
         then it will take around <span x-text="calculateChargingTime()" class="font-bold text-indigo-900"></span>
         to reach SoC of <span x-text="`${targetSoc}%`" class="font-bold text-indigo-900"></span>🔋
         and range of <span x-text="`${calculateRangeAtPercentage(targetSoc)} km`" class="font-bold text-indigo-900"></span>.
-        The total cost will be <span x-text="`SAR ${calculateChargingCost()}`" class="font-bold text-indigo-900"></span> 💰
+        The total cost will be <span x-text="`SAR ${calculateChargingCost()}`" id="cost" class="font-bold text-indigo-900"></span> 💰
       </p>
       <div class="mt-5 text-xs text-center text-gray-600 opacity-80">
         <button class="p-4 cursor-pointer" phx-click="reset">another car? <span class="text-2xl">🧹</span></button>
